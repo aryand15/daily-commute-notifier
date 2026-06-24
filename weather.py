@@ -62,17 +62,18 @@ def get_weather_info(
     umbrella_threshold: int = 40,
 ) -> WeatherInfo:
     """
-    Generate a summary of the weather for the entire day as well as key commuting time, using Open-Meteo.
+    Generate a summary of the weather from 7:00 AM to 6:00 PM, focusing on key commuting time, using Open-Meteo.
 
-    Important: this function assumes the notification is delivered at 6:30 AM.
+    Important: this function assumes the notification is delivered before 7:00 AM, because it only returns forecasted weather data.
+    So if it runs late, there will be a discrepancy between the returned forecast data and the real recorded data for hours between 7:00 AM and the delivery time of the notification.
 
     This function fetches:
         - Daily weather summary
         - Daily low/high temperatures
-        - Umbrella recommendation
-        - Morning commute forecast
-        - Evening commute forecast
-        - Predicted rain times during daytime hours
+        - Umbrella recommendation (based on whether rain probability ever passes a threshold for any hour from 7:00 AM - 6:00 PM)
+        - Morning commute forecast (temp, condition, and rain probability for each hour from 7:00 AM - 9:00 AM)
+        - Evening commute forecast (temp, condition, and rain probability for each hour from 5:00 PM - 6:00 PM)
+        - Predicted rain times (any hour from 7:00 AM - 6:00 PM)
 
     Args:
         lat (float): Latitude (-90 to 90).
@@ -101,7 +102,7 @@ def get_weather_info(
 
     url = (
         "https://api.open-meteo.com/v1/forecast"
-        f"?latitude={lat}&longitude={lng}"
+        f"?latitude={lat}&longitude={-lng if 0 < lng < 90 else lng}"
         "&hourly="
         "temperature_2m,precipitation_probability,weather_code"
         "&daily="
@@ -115,13 +116,13 @@ def get_weather_info(
 
     data = fetch_with_retries(url)
 
-    hourly = data["hourly"]
+    hourly = data["hourly"] 
     daily = data["daily"]
 
-    timestamps = hourly["time"]
-    temperatures = hourly["temperature_2m"]
-    rain_probs = hourly["precipitation_probability"]
-    weather_codes = hourly["weather_code"]
+    timestamps: List[str] = hourly["time"]
+    temperatures: List[float] = hourly["temperature_2m"]
+    rain_probs: List[float] = hourly["precipitation_probability"]
+    weather_codes: List[int] = hourly["weather_code"]
 
     forecast_lookup = {
         timestamp: {
@@ -171,7 +172,6 @@ def get_weather_info(
     ]
 
     rain_times: List[str] = []
-    seen_hours: set[int] = set()
 
     for (
         timestamp,
@@ -181,22 +181,14 @@ def get_weather_info(
         rain_probs,
     ):
         dt = datetime.fromisoformat(timestamp)
-
-        if timestamp[:10] != forecast_date:
-            continue
-
         if dt.hour < 6 or dt.hour > 18:
             continue
-
         if rain_probability < umbrella_threshold:
             continue
 
-        if dt.hour in seen_hours:
-            continue
-
-        seen_hours.add(dt.hour)
         rain_times.append(format_hour(dt))
 
+    # Pretty conservative but it's good to be prepared
     umbrella_needed = len(rain_times) > 0
 
     return {
