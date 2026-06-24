@@ -1,31 +1,33 @@
 name: Send daily morning weather + commute notification
 
 on:
-    schedule:
-    - cron: '30 10 * 6-8 1-5'     
+  workflow_dispatch:
+  schedule:
+    - cron: '30 10 * 6-8 1-5'
 
 jobs:
-    send_daily_notification:
-        name: Send daily notification
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
+  send_daily_notification:
+    name: Send daily notification
+    runs-on: ubuntu-latest
 
-            - uses: actions/setup-python@v5
-              with:
-                python-version: '3.11'
+    steps:
+      - uses: actions/checkout@v4
 
-            - name: Install uv
-              uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-            - name: Install dependencies
-              run: uv sync
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
-            - name: Send daily notification
-              env:
-                SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
-                SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
-                RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
-                HOME_LATITUDE: ${{ secrets.HOME_LATITUDE }}
-                HOME_LONGITUDE: ${{ secrets.HOME_LONGITUDE }}
-              run: uv run main.py
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Send daily notification
+        env:
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+          HOME_LATITUDE: ${{ secrets.HOME_LATITUDE }}
+          HOME_LONGITUDE: ${{ secrets.HOME_LONGITUDE }}
+        run: uv run main.py
