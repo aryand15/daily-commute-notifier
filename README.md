@@ -1,4 +1,4 @@
-# Morning Commute Notifier
+# Daily Commute Notifier
 
 An automation that runs every morning. Texts me an overview of the weather for the day and in the future will also tell me what time my bus is expected to arrive for my daily morning commute for summer 2026.
 
