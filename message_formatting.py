@@ -1,18 +1,24 @@
 """Module that handles converting structured commute info into human-digestible content."""
 
+from transit import BusArrivalInfo
 from weather import WeatherInfo
 
 
-def format_message(weather_info: WeatherInfo) -> str:
+def format_message(
+    weather_info: WeatherInfo,
+    bus_arrival_info: BusArrivalInfo | None
+) -> str:
     """
-    Convert WeatherInfo into an SMS-friendly weather briefing.
+    Convert commute info into an SMS-friendly briefing.
 
     Args:
         weather_info (WeatherInfo): Structured weather information.
+        bus_arrival_info (BusArrivalInfo | None): Structured bus arrival info, or None if no arrival is available.
 
     Returns:
-        str: Formatted weather briefing.
+        str: Formatted commute briefing.
     """
+
     umbrella_text = (
         "should bring an umbrella"
         if weather_info["umbrella_needed"]
@@ -23,12 +29,25 @@ def format_message(weather_info: WeatherInfo) -> str:
         (
             f"It will be {weather_info['summary']} overall today, "
             f"with a low of {weather_info['low']}°F and "
-            f"high of {weather_info['high']}°F."
+            f"high of {weather_info['high']}°F. "
+            f"You {umbrella_text}."
         ),
-        f"You {umbrella_text}.",
-        "",
-        "Morning commute:",
+        ""
     ]
+
+    if bus_arrival_info is None:
+        lines.append("No upcoming bus arrivals found right now.")
+    else:
+        lines.append(f"Be prepared to reach the bus stop at {bus_arrival_info['arrival_time']}.")
+        if bus_arrival_info["alerts"]:
+            lines.append(f"Alerts: {', '.join(bus_arrival_info['alerts'])}")
+
+    lines.extend(
+        [
+            "",
+            "Morning commute:",
+        ]
+    )
 
     for point in weather_info["morning_commute"]:
         line = (

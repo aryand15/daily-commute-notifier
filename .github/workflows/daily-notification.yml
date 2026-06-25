@@ -30,4 +30,7 @@ jobs:
           RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
           HOME_LATITUDE: ${{ secrets.HOME_LATITUDE }}
           HOME_LONGITUDE: ${{ secrets.HOME_LONGITUDE }}
+          MBTA_ROUTE_ID: ${{ secrets.MBTA_ROUTE_ID }}
+          MBTA_STOP_ID: ${{ secrets.MBTA_STOP_ID }}
+          MBTA_DIRECTION_ID: ${{ secrets.MBTA_DIRECTION_ID }}
         run: uv run main.py
