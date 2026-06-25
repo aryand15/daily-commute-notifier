@@ -102,7 +102,7 @@ def get_weather_info(
 
     url = (
         "https://api.open-meteo.com/v1/forecast"
-        f"?latitude={lat}&longitude={-lng if 0 < lng < 90 else lng}"
+        f"?latitude={lat}&longitude={lng}"
         "&hourly="
         "temperature_2m,precipitation_probability,weather_code"
         "&daily="
