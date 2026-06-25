@@ -6,20 +6,19 @@ from typing import List, TypedDict
 from util import fetch_with_retries, format_hour
 
 
-class CommutePoint(TypedDict):
+class WeatherDataPoint(TypedDict):
     time: str
     temperature: float
     condition: str
     rain_probability: int
 
 class WeatherInfo(TypedDict):
-    summary: str
     low: float
     high: float
     umbrella_needed: bool
     rain_times: List[str]
-    morning_commute: List[CommutePoint]
-    evening_commute: List[CommutePoint]
+    morning_commute: List[WeatherDataPoint]
+    evening_commute: List[WeatherDataPoint]
 
 
 def interpret_weather_code(code: int) -> str:
@@ -148,7 +147,7 @@ def get_weather_info(
     def build_commute_point(
         display_time: str,
         forecast_time: str,
-    ) -> CommutePoint:
+    ) -> WeatherDataPoint:
         timestamp = f"{forecast_date}T{forecast_time}"
 
         forecast = forecast_lookup[timestamp]
