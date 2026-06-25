@@ -39,11 +39,11 @@ def fetch_with_retries(
                 time.sleep(2**attempt)
 
     raise RuntimeError(
-        f"Failed to fetch weather data after {retries} attempts."
+        f"Failed to fetch data after {retries} attempts."
     ) from last_exception
 
 
-def format_hour(dt: datetime) -> str:
+def format_timestamp(dt: datetime) -> str:
     """
     Convert a datetime into a human-readable hour string.
 
@@ -56,4 +56,4 @@ def format_hour(dt: datetime) -> str:
     Returns:
         str: Formatted hour string.
     """
-    return dt.strftime("%I:00 %p").lstrip("0")
+    return dt.strftime("%I:%M %p").lstrip("0")

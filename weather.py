@@ -3,7 +3,7 @@
 from __future__ import annotations
 from datetime import datetime
 from typing import List, TypedDict
-from util import fetch_with_retries, format_hour
+from util import fetch_with_retries, format_timestamp
 
 
 class WeatherDataPoint(TypedDict):
@@ -144,7 +144,7 @@ def get_weather_info(
 
     forecast_date = timestamps[0][:10]
 
-    def build_commute_point(
+    def build_weather_data_point(
         display_time: str,
         forecast_time: str,
     ) -> WeatherDataPoint:
@@ -160,14 +160,14 @@ def get_weather_info(
         }
 
     morning_commute = [
-        build_commute_point("7:00 AM", "07:00"),
-        build_commute_point("8:00 AM", "08:00"),
-        build_commute_point("9:00 AM", "09:00"),
+        build_weather_data_point("7:00 AM", "07:00"),
+        build_weather_data_point("8:00 AM", "08:00"),
+        build_weather_data_point("9:00 AM", "09:00"),
     ]
 
     evening_commute = [
-        build_commute_point("5:00 PM", "17:00"),
-        build_commute_point("6:00 PM", "18:00"),
+        build_weather_data_point("5:00 PM", "17:00"),
+        build_weather_data_point("6:00 PM", "18:00"),
     ]
 
     rain_times: List[str] = []
@@ -185,7 +185,7 @@ def get_weather_info(
         if rain_probability < umbrella_threshold:
             continue
 
-        rain_times.append(format_hour(dt))
+        rain_times.append(format_timestamp(dt))
 
     # Pretty conservative but it's good to be prepared
     umbrella_needed = len(rain_times) > 0
