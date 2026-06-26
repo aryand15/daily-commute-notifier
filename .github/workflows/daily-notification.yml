@@ -3,7 +3,7 @@ name: Send daily morning weather + commute notification
 on:
   workflow_dispatch:
   schedule:
-    - cron: '34 6 * 6-8 1-5'
+    - cron: '18 7 * 6-8 1-5'
       timezone: 'America/New_York'
 
 jobs:

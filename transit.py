@@ -50,15 +50,20 @@ def get_bus_arrival_info(mbta_route_id: str, mbta_stop_id: str, mbta_direction_i
     parsed_arrivals = []
     for arrival in raw_arrivals_list:
         time_str = arrival["attributes"].get("arrival_time")
+
+        # Make sure the predicted arrival is there
+        if time_str is None:
+            continue
         
         # Convert raw string into datetime object for binary search calculations
         arrival_dt = dt.datetime.fromisoformat(time_str)
+        arrival_time = format_timestamp(arrival_dt)
         alert_ids = [alert["id"] for alert in arrival["relationships"]["alerts"]["data"]]
         
         parsed_arrivals.append({
             "datetime_obj": arrival_dt,
             "info": {
-                "arrival_time": format_timestamp(arrival_dt),
+                "arrival_time": arrival_time,
                 "alerts": alert_ids
             }
         })
